@@ -3,11 +3,11 @@ const wppconnect = require("@wppconnect-team/wppconnect");
 
 wppconnect
   .create({
-    session: "WhatsMOD", //Pass the name of the client you want to start the bot
+    session: "Diego G.", //Pass the name of the client you want to start the bot
     statusFind: (statusSession, session) => {
-      console.log("Status Session: ", statusSession); //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken
+      console.log("Status da Sessão: ", statusSession); //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken
       //Create session wss return "serverClose" case server for close
-      console.log("Session name: ", session);
+      console.log("Nome da Sessão: ", session);
     },
     headless: true, // Headless chrome
     devtools: false, // Open devtools by default
@@ -40,11 +40,18 @@ wppconnect
 // Variável para rastrear o estado da conversa
 const conversationState = {};
 
-const lista = 
-"1. [Nome do Dentista] - O seu sorriso pode mudar o mundo\n" +
-"2. Link ao site\n" +
-"3. Endereços - Manaus; Amazonas\n" +
-"4. Finalizar o atendimento";
+const lista = "Para escolher sobre qual assunto vamos conversar hoje, digite o *número* correspondente a uma das opções abaixo:\n\n" +
+"*3* - Informação, Endereço e Horário de Funcionamento da Clínica\n" +
+"*4* - Informações sobre sua Consulta\n" +
+"*5* - Marcar Consulta\n" +
+"*6* - Cancelar Consulta\n" +
+"*7* - Promoções\n" +
+"*8* - Dúvidas Recorrentes\n" +
+"*9* - Redes Sociais\n\n" +
+"*10* - Finalizar conversa";
+
+const lista2 =
+  "Digite o número referente a uma das opções abaixo:\n\n*1 - Deixe seu Feedback*\n\n*2 - Outros Assuntos*";
 
 function start(client) {
   client.onMessage((message) => {
@@ -115,18 +122,13 @@ function saudacaoPorHora() {
 
 async function mensagemInicial(client, texto) {
   const saudacao = saudacaoPorHora(); // Obtenha a saudação com base na hora atual
-  const textoInicial =
-    saudacao +
-    ", Bem vindo ao ChatBot do [Nome do Dentista].";
-  const opcoesMensagem =
-    "A seguir algumas opções para você:\n" +
-    lista;
+  const textoInicial = saudacao;
+  const PrimeiraMsg = 'Eu sou a _Alicia_, Atendente Virtual da Clínica Odontológica.\nNosso horário de atendimento é de *segunda a sexta-feira, das 8:00h às 16:00h.*'
+  const opcoesMensagem = lista2;
 
   try {
-    // Envie a saudação
     await client.sendText(texto, textoInicial);
-
-    // Envie as opções
+    await client.sendText(texto, PrimeiraMsg);
     await client.sendText(texto, opcoesMensagem);
 
     console.log("Mensagens enviadas com sucesso.");
@@ -134,15 +136,15 @@ async function mensagemInicial(client, texto) {
     console.error("Erro ao enviar mensagens: ", erro);
   }
 }
-  /*
-    client
-    .sendText(texto, textoInicial)
-    .then((result) => {
-      console.log("Result: ", result);
-    })
-    .catch((error) => {
-      console.error("Erro ao enviar mensagem: ", error);
-    });*/
+/*
+  client
+  .sendText(texto, textoInicial)
+  .then((result) => {
+    console.log("Result: ", result);
+  })
+  .catch((error) => {
+    console.error("Erro ao enviar mensagem: ", error);
+  });*/
 
 async function sendDefaultResponse(client, recipient) {
   // Resposta padrão para mensagens que o bot não entende.
@@ -189,9 +191,7 @@ async function funcOne(client, text) {
 }
 
 async function funcTwo(client, text) {
-  const response =
-    "Acesse o site do [Nome do Dentista] por esse link:\n" +
-    "[LINK]";
+  const response = lista;
 
   try {
     let resultado = await client.sendText(text, response);
