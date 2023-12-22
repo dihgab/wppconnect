@@ -1,15 +1,14 @@
 {
-  "name": "wppconnect",
+  "name": "wpp-connect",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@wppconnect-team/wppconnect": "^1.28.3"
+    "@wppconnect-team/wppconnect": "^1.28.0"
   }
 }
