@@ -119,27 +119,59 @@ function start(client) {
 }
 
 // LIDAR COM CONVERSAS
+
 function handleConversation(client, user, message) {
-  const state = conversationState[user]; // Aqui state vai receber vai obter o estado atual do user em especifico salvo no objeto conversationState
+  const state = conversationState[user];
+
   switch (state.step) {
     case 0:
       mensagemInicial(client, user);
       state.step = 1;
+      startTimer(client, user);
       break;
     case 1:
       const choice = parseInt(message);
       if (!isNaN(choice) && choice >= 1 && choice <= 8) {
         handleChoice(client, user, choice);
-        state.step = 1; // Mantem na mesma linha de escolhas
+        state.step = 1;
+        resetTimer(client, user);
       } else if (!isNaN(choice) && choice == 9) {
         handleChoice(client, user, choice);
-        state.step = 0; // Reiniciar o ciclo
+        state.step = 0;
+        resetTimer(client, user);
       } else {
         sendDefaultResponse(client, user);
+        setTimeout(() => {
+          client
+            .sendText(user, "Você ainda está aí?")
+            .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
+        }, 10000);
       }
       break;
   }
 }
+
+function startTimer(client, user) {
+  conversationState[user].timerId = setInterval(() => {
+    client
+      .sendText(user, "Você ainda está aí?")
+      .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
+  }, 10000);
+}
+
+function resetTimer(client, user) {
+  clearInterval(conversationState[user].timerId);
+  startTimer(client, user);
+}
+
+// Função para responder à perda de contato
+function responderPerdaContato(client, user) {
+  client
+    .sendText(user, "Achei que tivesse te perdido. Vamos recomeçar!")
+    .then(() => mensagemInicial(client, user))
+    .catch((erro) => console.error("Erro ao responder à perda de contato: ", erro));
+}
+
 
 //LIDAR COM DECISÕES 
 function handleChoice(client, user, choice) {
