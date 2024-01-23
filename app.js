@@ -37,49 +37,6 @@ wppconnect
     console.log(error);
   });
 
-
-
-
-/*
-function start(client) {
-  let timerId;
-
-  // Função para enviar a mensagem de lembrete
-  function enviarLembrete() {
-    client
-      .sendText(client.session.user, "Você ainda está aí?")
-      .then(() => console.log("Mensagem de lembrete enviada"))
-      .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
-  }
-
-  // Função para reiniciar o temporizador
-  function reiniciarTemporizador() {
-    clearInterval(timerId); // Limpa o temporizador existente
-    timerId = setInterval(enviarLembrete, 10000); // Configura um novo temporizador de 10 segundos
-  }
-
-  // Configura o temporizador inicial
-  reiniciarTemporizador();
-
-  // Ouvinte para mensagens recebidas
-  client.onMessage(async (message) => {
-    console.log("Mensagem recebida:", message.body);
-
-    // Reinicia o temporizador sempre que uma mensagem é recebida
-    reiniciarTemporizador();
-
-    // Verifica se a mensagem é a resposta ao lembrete
-    if (message.body.toLowerCase().includes("ops, eu não tinha percebido")) {
-      clearInterval(timerId); // Limpa o temporizador se a resposta for recebida
-      console.log("Cliente respondeu ao lembrete");
-    }
-  });
-}
-
-*/
-
-
-
 // Variável para rastrear o estado da conversa
 const conversationState = {};
 
@@ -101,7 +58,7 @@ const lista3 = "Aqui estão alguns dos tipos de serviços que oferecemos:\n\n" +
   "3. *Neuropsicologia:*\n• _Dheniff Kelly_\n\n" +
   "4. *Pediatria:*\n• ~Não Identificado~\n\n" +
   "5. *Clínico Geral:*\n• _Dr. Edmundo Roca_\n\n" +
-  "Se precisar agendar consulta, digite *5 (Marcar Consulta)* para receber mais informações sobre.";
+  "Se precisar agendar consulta, digite *4 (Marcar Consulta)* para receber mais informações sobre.";
 
 function start(client) {
   client.onMessage((message) => {
@@ -138,18 +95,30 @@ function handleConversation(client, user, message) {
       } else if (!isNaN(choice) && choice == 9) {
         handleChoice(client, user, choice);
         state.step = 0;
-        resetTimer(client, user);
-      } else {
-        sendDefaultResponse(client, user);
-        setTimeout(() => {
-          client
-            .sendText(user, "Você ainda está aí?")
-            .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
-        }, 10000);
+        stopTimer(client, user); 
       }
       break;
   }
 }
+
+function startTimer(client, user) {
+  conversationState[user].timerId = setInterval(() => {
+    client
+      .sendText(user, "Você ainda está aí?")
+      .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
+  }, 100000);
+}
+
+function resetTimer(client, user) {
+  clearInterval(conversationState[user].timerId);
+  startTimer(client, user);
+}
+
+
+function stopTimer(client, user) {
+  clearInterval(conversationState[user].timerId);
+}
+
 
 function startTimer(client, user) {
   conversationState[user].timerId = setInterval(() => {
@@ -162,14 +131,6 @@ function startTimer(client, user) {
 function resetTimer(client, user) {
   clearInterval(conversationState[user].timerId);
   startTimer(client, user);
-}
-
-// Função para responder à perda de contato
-function responderPerdaContato(client, user) {
-  client
-    .sendText(user, "Achei que tivesse te perdido. Vamos recomeçar!")
-    .then(() => mensagemInicial(client, user))
-    .catch((erro) => console.error("Erro ao responder à perda de contato: ", erro));
 }
 
 
