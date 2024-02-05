@@ -37,20 +37,20 @@ wppconnect
     console.log(error);
   });
 
+
 // Variável para rastrear o estado da conversa
 const conversationState = {};
 
 const lista = "Para escolher sobre qual assunto vamos conversar hoje, digite o *número* correspondente a uma das opções abaixo:\n\n" +
   "*2* - _Informações e Endereço da Clínica_\n" +
   "*3* - _Tipos de Serviços_\n" +
-  "*4* - _Marcar Consulta_\n" +
-  "*5* - _Cancelar Consulta_\n" +
-  "*6* - _Paciente Clube+_\n" +
-  "*7* - _Contratar Planos Clube+_\n" +
-  "*8* - _Redes Sociais_\n\n" +
-  "*9* - _Finalizar conversa_";
+  "*4* - _Agendar Consulta_\n" +
+  "*5* - _Paciente Clube+_\n" +
+  "*6* - _Contratar Planos Clube+_\n" +
+  "*7* - _Redes Sociais_\n\n" +
+  "*8* - _Finalizar conversa_";
 
-const lista2 = "Digite o número referente a uma das opções abaixo:\n\n*1 - Atendimento*\n\n*9 - Finalizar Conversa*";
+const lista2 = "Digite o número referente a uma das opções abaixo:\n\n*1 - Atendimento*\n\n*8 - Finalizar Conversa*";
 
 const lista3 = "Aqui estão alguns dos tipos de serviços que oferecemos:\n\n" +
   "1. *Ultrassonografia Geral:*\n• Dr. _Daniel Palácios_\n\n" +
@@ -58,7 +58,25 @@ const lista3 = "Aqui estão alguns dos tipos de serviços que oferecemos:\n\n" +
   "3. *Neuropsicologia:*\n• _Dheniff Kelly_\n\n" +
   "4. *Pediatria:*\n• ~Não Identificado~\n\n" +
   "5. *Clínico Geral:*\n• _Dr. Edmundo Roca_\n\n" +
-  "Se precisar agendar consulta, digite *4 (Marcar Consulta)* para receber mais informações sobre.";
+  "Se precisar agendar consulta, digite *4 (Agendar Consulta)* para receber mais informações sobre.";
+
+const lista4 = "*Agende sua consulta clicando no link abaixo.*\n"+
+  "https://rebrand.ly/Atendimento_Cemed";
+
+const lista5 = "*Todos os planos do Clube Labrea+:*\n\n" +
+"1. *Familiar Premium*\n_Fidelidade de 12 meses. Titular + 2 dependentes_\n\n" +
+"2. *Familiar Premium (Anual)*\n_Fidelidade de 12 meses, 7% de desconto no cartão ou pix. + Titular + 2 dependentes_\n\n" +
+"3. *Individual Básico*\n\n\n" +
+"4. *Individual Premium*\nFidelidade de 12 meses\n\n" +
+"5. *Individual Premium (Anual)*\n_Fidelidade de 12 meses, 7% de desconto no cartão ou pix_\n\n" +
+"Se precisar contratar algum plano, digite *6 (Contratar Planos Clube+)* para receber mais informações sobre.";
+
+const lista6 = "Acesse o Link abaixo pra contratar um dos nossos _planos_, por via de dúvidas digite *5 (Paciente Clube+)* para verificar os planos disponiveis.\n" +
+"https://labrea.tenex.com.br/contratar/Labrea?custom_vendedor=LORENAVERONA";
+
+const lista7 = "Fique por dentro de novidades nos acompanhando nas redes sociais!\n" +
+"Instagram - *@cemedlabrea*\n_Link:_ https://www.instagram.com/cemedlabrea/";
+
 
 function start(client) {
   client.onMessage((message) => {
@@ -88,11 +106,11 @@ function handleConversation(client, user, message) {
       break;
     case 1:
       const choice = parseInt(message);
-      if (!isNaN(choice) && choice >= 1 && choice <= 8) {
+      if (!isNaN(choice) && choice >= 1 && choice <= 7) {
         handleChoice(client, user, choice);
         state.step = 1;
         resetTimer(client, user);
-      } else if (!isNaN(choice) && choice == 9) {
+      } else if (!isNaN(choice) && choice == 8) {
         handleChoice(client, user, choice);
         state.step = 0;
         stopTimer(client, user); 
@@ -106,7 +124,7 @@ function startTimer(client, user) {
     client
       .sendText(user, "Você ainda está aí?")
       .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
-  }, 100000);
+  }, 1200000);
 }
 
 function resetTimer(client, user) {
@@ -125,7 +143,7 @@ function startTimer(client, user) {
     client
       .sendText(user, "Você ainda está aí?")
       .catch((erro) => console.error("Erro ao enviar mensagem de lembrete: ", erro));
-  }, 10000);
+  }, 1200000);
 }
 
 function resetTimer(client, user) {
@@ -140,7 +158,7 @@ function handleChoice(client, user, choice) {
     case 1:
       funcTwo(client, user);
       break;
-    case 9:
+    case 8:
       finalizando(client, user);
       break;
     case 2:
@@ -148,6 +166,18 @@ function handleChoice(client, user, choice) {
       break;
     case 3:
       funcThr(client, user);
+      break;
+    case 4:
+      funcFor(client, user);
+      break;
+    case 5:
+      funcFive(client, user);
+      break;
+    case 6:
+      funcSix(client, user);
+      break;
+    case 7:
+      funcSeven(client, user);
       break;
     default:
       sendDefaultResponse(client, user);
@@ -214,13 +244,10 @@ async function sendDefaultResponse(client, recipient) {
 }
 
 async function funcOne(client, text) {
-  const resposta1 = "Olá e seja bem-vindo à Clínica _CEMED_!\n\n*CONTATOS*\nE-mail: *cemedlabrea@gmail.com*\nTelefone(s): *(97) 98457-8779*\n\n*LOCALIZAÇÃO*:\nLogradouro: *Avenida Getúlio Vargas, N° 162.*\nComplemento: *Sala 01.*\nBairro: *Centro.*\nCEP: *69830-000.*\nMunicípio: *Lábrea.*\nEstado: *Amazonas.*\n\nLink abaixo da localização no Google Maps.";
-  const resposta2 = "https://maps.app.goo.gl/ehVpcXb32rTZP1Bm7"
+  const resposta1 = "Olá e seja bem-vindo à Clínica _CEMED_!\n\n*CONTATOS*\nE-mail: *cemedlabrea@gmail.com*\nTelefone(s): *(97) 98457-8779*\n\n*LOCALIZAÇÃO*:\nLogradouro: *Avenida Getúlio Vargas, N° 162.*\nComplemento: *Sala 01.*\nBairro: *Centro.*\nCEP: *69830-000.*\nMunicípio: *Lábrea.*\nEstado: *Amazonas.*\n\nLink abaixo da localização no Google Maps.\nhttps://maps.app.goo.gl/ehVpcXb32rTZP1Bm7";
   try {
     let resultado = await client.sendText(text, resposta1);
     console.log("Result: ", resultado);
-    let resultado2 = await client.sendText(text, resposta2);
-    console.log("Result: ", resultado2);
 
   } catch (erro) {
     console.error("Error when sending: ", erro); //return object error
@@ -242,20 +269,10 @@ async function funcTwo(client, text) {
   try {
     let resultado = await client.sendText(text, response);
     console.log("Result: ", resultado);
-    // let resultado2 = await client.sendText(text, lista);
-    // console.log("Result: ", resultado2);
   } catch (erro) {
-    console.error("Error when sending: ", erro); //return object error
+    console.error("Error when sending: ", erro); 
   }
 
-  /* client
-     .sendText(text, response)
-     .then((result) => {
-       console.log("Result: ", result);
-     })
-     .catch((error) => {
-       console.error("Erro ao enviar mensagem: ", error);
-     });*/
 }
 
 async function funcThr(client, text) {
@@ -278,6 +295,54 @@ async function funcThr(client, text) {
     .catch((error) => {
       console.error("Erro ao enviar mensagem: ", error);
     });*/
+}
+
+async function funcFor(client, text) {
+  const response = lista4;
+
+  try {
+    let resultado = await client.sendText(text, response);
+    console.log("Result: ", resultado);
+  } catch (erro) {
+    console.error("Error when sending: ", erro); 
+  }
+
+}
+
+async function funcFive(client, text) {
+  const response = lista5;
+
+  try {
+    let resultado = await client.sendText(text, response);
+    console.log("Result: ", resultado);
+  } catch (erro) {
+    console.error("Error when sending: ", erro); 
+  }
+
+}
+
+async function funcSix(client, text) {
+  const response = lista6;
+
+  try {
+    let resultado = await client.sendText(text, response);
+    console.log("Result: ", resultado);
+  } catch (erro) {
+    console.error("Error when sending: ", erro); 
+  }
+
+}
+
+async function funcSeven(client, text) {
+  const response = lista7;
+
+  try {
+    let resultado = await client.sendText(text, response);
+    console.log("Result: ", resultado);
+  } catch (erro) {
+    console.error("Error when sending: ", erro); 
+  }
+
 }
 
 async function finalizando(client, text) {
